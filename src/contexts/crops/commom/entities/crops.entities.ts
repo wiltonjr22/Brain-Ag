@@ -9,6 +9,10 @@ export abstract class CropFactoryEntity {
   @Expose()
   @IsUUID()
   farmId: string;
+
+  @Expose()
+  @IsUUID()
+  harvestId: string;
 }
 
 export class CropEntity extends CropFactoryEntity {
