@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsEnum } from 'class-validator';
+import { IsOptional, IsString, IsEnum, IsBoolean } from 'class-validator';
 import { DocType } from '../../commom/entities/producer.entities';
 
 export class UpdateProducerDto {
@@ -27,4 +27,12 @@ export class UpdateProducerDto {
   @IsOptional()
   @IsEnum(DocType)
   docType?: DocType;
+
+  @ApiPropertyOptional({
+    description: 'Flag para indicar se o comunicado está ativo',
+    example: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
 }
