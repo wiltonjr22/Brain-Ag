@@ -1,0 +1,40 @@
+{
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "testTimeout": 90000,
+  "testRegex": ".(spec|e2e).(ts|tsx|mts|mjs)$",
+  "testPathIgnorePatterns": ["/node_modules/", "/dist/"],
+  "coveragePathIgnorePatterns": ["/node_modules/"],
+  "workerIdleMemoryLimit": "128MB",
+  "collectCoverageFrom": [
+    "./src/**",
+    "!./src/modules/tests/*-test.ts",
+    "!<rootDir>/node_modules/"
+  ],
+  "verbose": true,
+  "expand": true,
+  "coverageProvider": "v8",
+  "coverageThreshold": {
+    "global": {
+      "lines": 90,
+      "statements": 90
+    }
+  },
+  "transform": {
+    "^.+\\.(mts|mjs|ts|cjs|js|tsx)?$": [
+      "ts-jest",
+      {
+        "isolatedModules": true,
+        "useESM": true
+      }
+    ]
+  },
+  "resetMocks": true,
+  "moduleFileExtensions": ["js", "cjs", "mjs", "ts", "mts"],
+  "modulePathIgnorePatterns": ["<rootDir>/dist/"],
+  "extensionsToTreatAsEsm": [".ts", ".mts"],
+  "moduleNameMapper": {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+    "^@/(.*)$": "<rootDir>/src/$1"
+  }
+}
