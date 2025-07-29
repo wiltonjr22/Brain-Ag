@@ -22,6 +22,12 @@ export abstract class ProducerFactoryEntity {
   @Expose()
   @IsBoolean()
   active: boolean;
+}
+
+export class ProducerEntity extends ProducerFactoryEntity {
+  @Expose()
+  @IsUUID()
+  id: string;
 
   @Expose()
   @IsDate()
@@ -30,10 +36,4 @@ export abstract class ProducerFactoryEntity {
   @Expose()
   @IsDate()
   updatedAt: Date;
-}
-
-export class ProducerEntity extends ProducerFactoryEntity {
-  @Expose()
-  @IsUUID()
-  id: string;
 }
