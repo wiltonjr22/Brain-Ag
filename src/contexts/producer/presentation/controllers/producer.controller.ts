@@ -7,6 +7,7 @@ import {
   Body,
   Put,
   Logger,
+  Query,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -14,33 +15,46 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { IProducerService } from '../../application/interfaces/producer.service';
 import { CreateProducerDto } from '../dtos/create.dto';
 import { UpdateProducerDto } from '../dtos/update.dto';
+import { ProducerFilterDto } from '../dtos/get.dto';
+import { ProducerEntity } from '../../commom/entities/producer.entities';
 
 @ApiTags('Produtores')
 @Controller('produtores')
 export class ProducerController {
   private readonly logger = new Logger(ProducerController.name);
 
-  constructor(private readonly communicationService: IProducerService) { }
+  constructor(private readonly producerService: IProducerService) { }
 
   @Post()
   @ApiOperation({ summary: 'Criar produtor rural' })
   @ApiBody({ type: CreateProducerDto })
   @ApiResponse({ status: 201, description: 'Produtor criado com sucesso.' })
   async create(@Body() dto: CreateProducerDto) {
-    this.logger.log('Requisição recebida para criar um produtor.');
-    return this.communicationService.create(dto);
+    this.logger.log('Request received to create a new producer.');
+    return this.producerService.create(dto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os produtores' })
   @ApiResponse({ status: 200, description: 'Lista de produtores retornada com sucesso.' })
-  async findAll() {
-    this.logger.log('Requisição recebida para listar produtores.');
-    return this.communicationService.findAll();
+  @ApiQuery({ name: 'name', required: false, description: 'Filtrar por nome do produtor', example: 'João da Silva' })
+  @ApiQuery({ name: 'document', required: false, description: 'Filtrar por CPF ou CNPJ', example: '12345678900' })
+  @ApiQuery({ name: 'docType', required: false, description: 'Filtrar por tipo de documento (CPF ou CNPJ)', example: 'CPF' })
+  @ApiQuery({ name: 'active', required: false, description: 'Filtrar por status ativo/inativo', example: true })
+  @ApiQuery({ name: 'createdAtStart', required: false, description: 'Data de criação inicial (formato ISO)', example: '2025-07-01T00:00:00.000Z' })
+  @ApiQuery({ name: 'createdAtEnd', required: false, description: 'Data de criação final (formato ISO)', example: '2025-07-31T23:59:59.000Z' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Número máximo de itens por página', example: 10, type: Number })
+  @ApiQuery({ name: 'offset', required: false, description: 'Número de itens para pular (offset da paginação)', example: 0, type: Number })
+  async findAll(
+    @Query() filter: ProducerFilterDto,
+  ): Promise<{ data: ProducerEntity[]; total: number }> {
+    this.logger.log('Request received to list producers with filters.');
+    return this.producerService.findAll(filter);
   }
 
   @Get(':id')
@@ -49,8 +63,8 @@ export class ProducerController {
   @ApiResponse({ status: 200, description: 'Produtor encontrado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Produtor não encontrado.' })
   async findOne(@Param('id') id: string) {
-    this.logger.log(`Requisição recebida para buscar produtor com ID: ${id}`);
-    return this.communicationService.findOne(id);
+    this.logger.log(`Request received to find producer with ID: ${id}`);
+    return this.producerService.findOne(id);
   }
 
   @Put(':id')
@@ -60,8 +74,8 @@ export class ProducerController {
   @ApiResponse({ status: 200, description: 'Produtor atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Produtor não encontrado.' })
   async update(@Param('id') id: string, @Body() dto: UpdateProducerDto) {
-    this.logger.log(`Requisição recebida para atualizar produtor com ID: ${id}`);
-    return this.communicationService.update(id, dto);
+    this.logger.log(`Request received to update producer with ID: ${id}`);
+    return this.producerService.update(id, dto);
   }
 
   @Delete(':id')
@@ -70,7 +84,7 @@ export class ProducerController {
   @ApiResponse({ status: 200, description: 'Produtor excluído com sucesso.' })
   @ApiResponse({ status: 404, description: 'Produtor não encontrado.' })
   async remove(@Param('id') id: string) {
-    this.logger.log(`Requisição recebida para excluir produtor com ID: ${id}`);
-    return this.communicationService.remove(id);
+    this.logger.log(`Request received to delete producer with ID: ${id}`);
+    return this.producerService.remove(id);
   }
 }
