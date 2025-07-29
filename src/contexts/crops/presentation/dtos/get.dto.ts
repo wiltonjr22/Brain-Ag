@@ -1,24 +1,27 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsUUID, IsString, IsNumber } from 'class-validator';
+import { IsOptional, IsUUID, IsString } from 'class-validator';
 
 export class CropFilterDto {
-  @ApiPropertyOptional({ description: 'Nome da cultura', example: 'Algodão' })
+  @ApiPropertyOptional({ description: 'Filtrar pelo nome da cultura', example: 'Milho' })
   @IsOptional()
   @IsString()
   name?: string;
 
-  @ApiPropertyOptional({ description: 'ID da fazenda associada', example: 'uuid-farm' })
+  @ApiPropertyOptional({ description: 'Filtrar por ID da fazenda', example: 'uuid-farm' })
   @IsOptional()
   @IsUUID()
   farmId?: string;
 
-  @ApiPropertyOptional({ description: 'Limite de itens por página', example: 10 })
+  @ApiPropertyOptional({ description: 'Filtrar por ID da safra', example: 'uuid-harvest' })
   @IsOptional()
-  @IsNumber()
-  limit?: number;
+  @IsUUID()
+  harvestId?: string;
 
-  @ApiPropertyOptional({ description: 'Itens a pular (offset)', example: 0 })
+  @ApiPropertyOptional({ description: 'Número máximo de itens por página', example: 10, default: 10 })
   @IsOptional()
-  @IsNumber()
-  offset?: number;
+  limit?: number = 10;
+
+  @ApiPropertyOptional({ description: 'Número de itens para pular (offset da paginação)', example: 0, default: 0 })
+  @IsOptional()
+  offset?: number = 0;
 }
