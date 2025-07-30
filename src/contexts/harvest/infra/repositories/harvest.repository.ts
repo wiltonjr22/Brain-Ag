@@ -46,7 +46,7 @@ export class HarvestRepository implements IHarvestRepository {
     return { data, total };
   }
 
-  async findById(id: string): Promise<HarvestEntity | null> {
+  async findOne(id: string): Promise<HarvestEntity | null> {
     this.logger.log(`Finding harvest by ID: ${id}`);
     const harvest = await this.prisma.harvest.findUnique({ where: { id } });
     if (!harvest) {

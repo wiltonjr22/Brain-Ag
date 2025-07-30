@@ -27,7 +27,7 @@ export class FarmService implements IFarmService {
 
   async findOne(id: string): Promise<FarmEntity> {
     this.logger.log(`Fetching farm by ID: ${id}`);
-    const farm = await this.farmRepository.findById(id);
+    const farm = await this.farmRepository.findOne(id);
     if (!farm) {
       this.logger.warn(`Farm with ID ${id} not found.`);
       throw new NotFoundException('Farm not found');

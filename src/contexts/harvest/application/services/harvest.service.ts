@@ -27,7 +27,7 @@ export class HarvestService implements IHarvestService {
 
   async findOne(id: string): Promise<HarvestEntity> {
     this.logger.log(`Fetching harvest with ID: ${id}`);
-    const harvest = await this.harvestRepository.findById(id);
+    const harvest = await this.harvestRepository.findOne(id);
     if (!harvest) {
       this.logger.warn(`Harvest with ID ${id} not found`);
       throw new NotFoundException('Harvest not found');

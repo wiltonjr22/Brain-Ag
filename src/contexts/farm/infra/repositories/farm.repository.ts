@@ -40,7 +40,7 @@ export class FarmRepository implements IFarmRepository {
     return { data, total };
   }
 
-  async findById(id: string): Promise<FarmEntity | null> {
+  async findOne(id: string): Promise<FarmEntity | null> {
     this.logger.log(`Fetching farm by ID: ${id}`);
     const farm = await this.prisma.farm.findUnique({ where: { id } });
     if (!farm) {
