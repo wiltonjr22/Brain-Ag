@@ -4,6 +4,7 @@ import { ProducerModule } from "./producer/producer.module";
 import { FarmModule } from "./farm/farm.module";
 import { HarvestModule } from "./harvest/harvest.module";
 import { CropModule } from "./crops/crops.module";
+import { DashboardModule } from "./dashboard/dashboard.module";
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { CropModule } from "./crops/crops.module";
     FarmModule,
     HarvestModule,
     CropModule,
+    DashboardModule
   ],
 })
 export class ContextsModule { }
