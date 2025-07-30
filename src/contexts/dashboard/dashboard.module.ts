@@ -4,7 +4,7 @@ import { DashboardController } from "./presentation/controllers/dashboard.contro
 import { IDashboardService } from "./application/interfaces/dashboard.service";
 import { DashboardService } from "./application/services/dashboard.service";
 import { IDashboardRepository } from "./infra/interfaces/dashboard.repository";
-import { DashboardRepository } from "./infra/repositories/communication.repository";
+import { DashboardRepository } from "./infra/repository/dashboard.repository";
 
 @Module({
   imports: [DatabasesModule],

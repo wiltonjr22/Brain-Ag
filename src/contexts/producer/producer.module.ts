@@ -4,7 +4,7 @@ import { DatabasesModule } from "@/resources/database/databases.modules";
 import { IProducerService } from "./application/interfaces/producer.service";
 import { ProducerService } from "./application/services/producer.service";
 import { IProducerRepository } from "./infra/interfaces/producer.repository";
-import { ProducerRepository } from "./infra/repositories/producer.repository";
+import { ProducerRepository } from "./infra/repository/producer.repository";
 
 @Module({
   imports: [DatabasesModule],
