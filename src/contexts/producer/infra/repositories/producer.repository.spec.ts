@@ -47,7 +47,7 @@ describe('ProducerRepository', () => {
         document: '12345678909',
       };
 
-      prisma.producer.create.mockResolvedValue({ ...dto, id: 'uuid', active: true, created_at: new Date(), updated_at: new Date() });
+      prisma.producer.create.mockResolvedValue({ ...dto, id: 'uuid', created_at: new Date(), updated_at: new Date() });
 
       await repository.create(dto);
 
@@ -65,7 +65,6 @@ describe('ProducerRepository', () => {
           name: 'Test Producer 1',
           document: '12345678909',
           doc_type: DocType.CPF,
-          active: true,
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -90,7 +89,6 @@ describe('ProducerRepository', () => {
         name: 'Test Producer',
         document: '12345678909',
         doc_type: DocType.CPF,
-        active: true,
         created_at: new Date(),
         updated_at: new Date(),
       };
@@ -122,7 +120,6 @@ describe('ProducerRepository', () => {
         name: 'Updated Producer',
         document: '12345678909',
         doc_type: DocType.CPF,
-        active: true,
         created_at: new Date(),
         updated_at: new Date(),
       };
@@ -137,7 +134,6 @@ describe('ProducerRepository', () => {
           name: updateDto.name,
           document: undefined,
           docType: undefined,
-          active: undefined,
         },
       });
 
@@ -145,16 +141,4 @@ describe('ProducerRepository', () => {
     });
   });
 
-  describe('remove', () => {
-    it('should set active to false on remove', async () => {
-      prisma.producer.update.mockResolvedValue({});
-
-      await repository.remove('uuid1');
-
-      expect(prisma.producer.update).toHaveBeenCalledWith({
-        where: { id: 'uuid1' },
-        data: { active: false },
-      });
-    });
-  });
 });

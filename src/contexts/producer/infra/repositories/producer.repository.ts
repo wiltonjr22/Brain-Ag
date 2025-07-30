@@ -27,7 +27,6 @@ export class ProducerRepository implements IProducerRepository {
       name,
       document,
       docType,
-      active,
       createdAtStart,
       createdAtEnd,
       limit = 10,
@@ -39,7 +38,6 @@ export class ProducerRepository implements IProducerRepository {
     if (name) where.name = { contains: name, mode: 'insensitive' };
     if (document) where.document = { contains: document };
     if (docType) where.doc_type = docType;
-    if (active !== undefined) where.active = active;
 
     if (createdAtStart || createdAtEnd) {
       where.created_at = {};
@@ -84,7 +82,6 @@ export class ProducerRepository implements IProducerRepository {
         name: data.name,
         document: data.document,
         docType: data.docType,
-        active: data.active,
       },
     });
     this.logger.log(`Producer with ID ${id} successfully updated.`);
@@ -92,13 +89,8 @@ export class ProducerRepository implements IProducerRepository {
   }
 
   async remove(id: string): Promise<void> {
-    this.logger.log(`Updating producer with ID: ${id}`);
-    await this.prisma.producer.update({
-      where: { id },
-      data: {
-        active: false,
-      },
-    });
+    this.logger.log(`Deleting producer with ID: ${id}`);
+    await this.prisma.producer.delete({ where: { id } });
     this.logger.log(`Producer with ID ${id} successfully updated.`);
     return;
   }
@@ -109,7 +101,6 @@ export class ProducerRepository implements IProducerRepository {
       name: data.name,
       document: data.document,
       docType: data.doc_type,
-      active: data.active,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     };

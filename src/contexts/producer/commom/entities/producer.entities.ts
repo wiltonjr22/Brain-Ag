@@ -19,9 +19,6 @@ export abstract class ProducerFactoryEntity {
   @IsString()
   name: string;
 
-  @Expose()
-  @IsBoolean()
-  active: boolean;
 }
 
 export class ProducerEntity extends ProducerFactoryEntity {

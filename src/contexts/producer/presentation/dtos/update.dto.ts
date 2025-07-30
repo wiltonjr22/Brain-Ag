@@ -29,14 +29,6 @@ export class UpdateProducerDto {
   @IsEnum(DocType)
   docType?: DocType;
 
-  @ApiPropertyOptional({
-    description: 'Flag para indicar se o produtor está ativo',
-    example: true,
-  })
-  @IsOptional()
-  @IsBoolean()
-  active?: boolean;
-
   @IsValidDocumentUpdateStrict({ message: 'Os campos document e docType devem ser enviados juntos e válidos para atualização' })
   validateDocumentUpdate?: any;
 }

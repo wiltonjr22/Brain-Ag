@@ -16,7 +16,6 @@ describe('ProducerService', () => {
     name: 'João da Silva',
     docType: DocType.CPF,
     document: '12345678909',
-    active: true,
     createdAt: new Date(),
     updatedAt: new Date(),
   };

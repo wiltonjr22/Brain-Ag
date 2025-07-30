@@ -26,11 +26,6 @@ export class ProducerFilterDto {
   @IsEnum(DocType)
   docType?: DocType;
 
-  @ApiPropertyOptional({ description: 'Filtrar por status ativo/inativo', example: true })
-  @IsOptional()
-  @IsBoolean()
-  active?: boolean;
-
   @ApiPropertyOptional({ description: 'Data de criação inicial (ISO 8601)', example: '2025-07-01T00:00:00.000Z' })
   @IsOptional()
   @IsDateString()

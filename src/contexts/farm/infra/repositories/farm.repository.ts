@@ -57,13 +57,8 @@ export class FarmRepository implements IFarmRepository {
   }
 
   async remove(id: string): Promise<void> {
-    this.logger.log(`Updating producer with ID: ${id}`);
-    await this.prisma.producer.update({
-      where: { id },
-      data: {
-        active: false,
-      },
-    });
+    this.logger.log(`Deleting producer with ID: ${id}`);
+    await this.prisma.farm.delete({ where: { id } });
     this.logger.log(`Producer with ID ${id} successfully updated.`);
     return;
   }

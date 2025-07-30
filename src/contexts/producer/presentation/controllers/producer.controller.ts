@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, Logger, Query, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Put, Logger, Query, NotFoundException, HttpCode, HttpStatus } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -37,7 +37,6 @@ export class ProducerController {
   @ApiQuery({ name: 'name', required: false, description: 'Filtrar por nome do produtor', example: 'João da Silva' })
   @ApiQuery({ name: 'document', required: false, description: 'Filtrar por CPF ou CNPJ', example: '12345678900' })
   @ApiQuery({ name: 'docType', required: false, description: 'Filtrar por tipo de documento (CPF ou CNPJ)', example: 'CPF' })
-  @ApiQuery({ name: 'active', required: false, description: 'Filtrar por status ativo/inativo', example: true })
   @ApiQuery({ name: 'createdAtStart', required: false, description: 'Data de criação inicial (formato ISO)', example: '2025-07-01T00:00:00.000Z' })
   @ApiQuery({ name: 'createdAtEnd', required: false, description: 'Data de criação final (formato ISO)', example: '2025-07-31T23:59:59.000Z' })
   @ApiQuery({ name: 'limit', required: false, description: 'Número máximo de itens por página', example: 10, type: Number })
@@ -73,6 +72,7 @@ export class ProducerController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Excluir produtor por ID' })
   @ApiParam({ name: 'id', description: 'ID do produtor', example: 'uuid-produtor' })
   @ApiResponse({ status: 200, description: 'Produtor excluído com sucesso.' })

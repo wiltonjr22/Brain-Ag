@@ -12,7 +12,6 @@ const mockProducer = {
   name: 'João da Silva',
   docType: 'CPF',
   document: '12345678909',
-  active: true,
 };
 
 const mockProducerService = {
