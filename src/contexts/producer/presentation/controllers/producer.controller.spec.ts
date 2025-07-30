@@ -88,10 +88,9 @@ describe('ProducerController', () => {
       const dto: CreateProducerDto = {
         name: 'Produtor CPF Inválido',
         docType: DocType.CPF,
-        document: '12345678900', // CPF inválido
+        document: '12345678900', 
       };
 
-      // Simula que a validação interna rejeita com erro
       mockProducerService.create.mockImplementation(() => {
         throw new Error('Documento inválido para o tipo informado');
       });
@@ -104,7 +103,7 @@ describe('ProducerController', () => {
       const dto: CreateProducerDto = {
         name: 'Produtor CNPJ Inválido',
         docType: DocType.CNPJ,
-        document: '00000000000000', // CNPJ inválido
+        document: '00000000000000', 
       };
 
       mockProducerService.create.mockImplementation(() => {
@@ -119,7 +118,7 @@ describe('ProducerController', () => {
       const dto: CreateProducerDto = {
         name: 'Produtor DocType CPF com documento CNPJ',
         docType: DocType.CPF,
-        document: '19100000000100', // formato CNPJ mas docType CPF
+        document: '19100000000100', 
       };
 
       mockProducerService.create.mockImplementation(() => {
@@ -134,7 +133,7 @@ describe('ProducerController', () => {
       const dto: CreateProducerDto = {
         name: 'Produtor DocType CNPJ com documento CPF',
         docType: DocType.CNPJ,
-        document: '12345678909', // formato CPF mas docType CNPJ
+        document: '12345678909',
       };
 
       mockProducerService.create.mockImplementation(() => {
