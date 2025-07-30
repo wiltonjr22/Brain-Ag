@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, Logger, Query, NotFoundException, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Logger, Query, NotFoundException, HttpCode, HttpStatus, Patch } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -60,7 +60,7 @@ export class ProducerController {
     return producer;
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Atualizar produtor por ID' })
   @ApiParam({ name: 'id', description: 'ID do produtor', example: 'uuid-produtor' })
   @ApiBody({ type: UpdateProducerDto })

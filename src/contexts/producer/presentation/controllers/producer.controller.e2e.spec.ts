@@ -56,15 +56,15 @@ describe('ProducerController (e2e)', () => {
     expect(response.body.id).toBe(createdId);
   });
 
-  it('/PUT produtores/:id', async () => {
+  it('/PATCh produtores/:id', async () => {
     if (!createdId) return;
 
     const response = await request(app.getHttpServer())
-      .put(`/produtores/${createdId}`)
+      .patch(`/produtores/${createdId}`)
       .send(updateDto)
       .expect(200);
 
-    console.log('PUT /produtores/:id response:', response.body);
+    console.log('PATCH /produtores/:id response:', response.body);
     expect(response.body.name).toBe(updateDto.name);
   });
 

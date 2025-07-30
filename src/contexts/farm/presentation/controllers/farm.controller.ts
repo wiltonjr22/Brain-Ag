@@ -9,7 +9,7 @@ import {
   Logger,
   HttpCode,
   HttpStatus,
-  Put,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -64,7 +64,7 @@ export class FarmController {
     return this.farmService.findOne(id);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiParam({ name: 'id', description: 'ID da fazenda', example: 'uuid' })
   @ApiOperation({ summary: 'Atualizar uma fazenda' })
   @ApiResponse({ status: 200, description: 'Fazenda atualizada com sucesso.' })
