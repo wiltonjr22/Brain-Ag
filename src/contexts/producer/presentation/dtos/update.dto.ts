@@ -1,6 +1,7 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsEnum, IsBoolean } from 'class-validator';
 import { DocType } from '../../commom/entities/producer.entities';
+import { IsValidDocumentUpdateStrict } from '../../commom/validators/valid-cpf-cnpj-update';
 
 export class UpdateProducerDto {
   @ApiPropertyOptional({
@@ -19,7 +20,7 @@ export class UpdateProducerDto {
   @IsString()
   document?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: DocType,
     example: DocType.CPF,
     description: 'Tipo de documento do produtor (CPF ou CNPJ)',
@@ -29,10 +30,13 @@ export class UpdateProducerDto {
   docType?: DocType;
 
   @ApiPropertyOptional({
-    description: 'Flag para indicar se o comunicado está ativo',
+    description: 'Flag para indicar se o produtor está ativo',
     example: true,
   })
   @IsOptional()
   @IsBoolean()
   active?: boolean;
+
+  @IsValidDocumentUpdateStrict({ message: 'Os campos document e docType devem ser enviados juntos e válidos para atualização' })
+  validateDocumentUpdate?: any;
 }

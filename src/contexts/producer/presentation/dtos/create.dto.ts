@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { DocType } from '../../commom/entities/producer.entities';
+import { IsValidDocument } from '../../commom/validators/valid-cpf-cnpj';
 
 export class CreateProducerDto {
   @ApiProperty({
@@ -17,8 +18,10 @@ export class CreateProducerDto {
     description: 'Número do CPF ou CNPJ do produtor',
   })
   @IsString()
-  @IsNotEmpty()
-  document: string; //todo fazer validação de CPF e CNPJ
+  @IsValidDocument('docType', {
+    message: 'Documento inválido para o tipo informado'
+  })
+  document: string;
 
   @ApiProperty({
     example: 'João da Silva',
