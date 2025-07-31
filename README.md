@@ -2,7 +2,7 @@
 
 A robust agro management API built with NestJS, Prisma, and PostgreSQL.
 
-## 🧱 Visão Geral
+## 🧱 Overview
 
 - 🎯 Advanced filters (with `between`) for queries
 - 📑 Documentation via Swagger
@@ -13,7 +13,7 @@ A robust agro management API built with NestJS, Prisma, and PostgreSQL.
 
 ---
 
-## 🚀 Tecnologias
+## 🚀 Technologies
 
 - **NestJS** – main framework
 - **Prisma ORM** – database access
@@ -24,33 +24,34 @@ A robust agro management API built with NestJS, Prisma, and PostgreSQL.
 
 ---
 
-## 🧭 Estrutura do Projeto
+## 🧭 Project Structure
 
 ````bash
 📦 src/
 │
-├── contexts/                # Módulos principais da aplicação
-│   ├── culture/             # CRUD de cultura
+├── contexts/                # Main modules of the application
+│   ├── crops/               # CRUD of crops
 │   ├── dashboard/           # dashboard query
-│   ├── farm/                # CRUD de fazendas
-│   ├── harvest/             # CRUD de colheitas
+│   ├── farm/                # CRUD of farm
+│   ├── harvest/             # CRUD of harvest
 │   ├── health/              # Health check
-│   ├── producer/            # CRUD de produtor
+│   ├── producer/            # CRUD of producer
 │   └── contexts.module.ts
 │
-├── resources/               # Recursos compartilhados
-│   ├── database/            # Configuração do Prisma
-│   ├── swagger/             # Setup da documentação Swagger
-│   ├── errors-handler.ts    # Manipulação global de erros
+├── resources/               # Shared resources
+│   ├── database/            # Prisma Configuration
+│   ├── swagger/             # Swagger documentation setup
+│   ├── errors-handler.ts    # Global error handling
 │   └── resources.module.ts
 │
 ├── app.module.ts
+├── error-response.dto.ts
 ├── main.ts
 │
 📦 prisma/
-│   ├── schema.prisma        # Modelo do banco
-│   ├── migrations/          # Migrations geradas
-│   └── seed.ts              # Popula base de dados
+│   ├── schema.prisma        # Schema database
+│   ├── migrations/          # Migrations 
+│   └── seed.ts              # seeds for test
 
 ---
 
@@ -68,7 +69,7 @@ A robust agro management API built with NestJS, Prisma, and PostgreSQL.
 
 ```bash
 git clone https://github.com/seu-usuario/Brain-Ag.git
-cd comunicados-api
+cd Brain-Ag
 
 # Copy the envs
 cp .env.example .env
@@ -133,4 +134,4 @@ Run unit tests with:
 npm run t
 ```
 
-- Tests cover controllers and services, using mocks for external dependencies.
+- Tests cover controllers and services, using mocks for external dependencies for unit and for e2e we use seeds and data
