@@ -10,6 +10,7 @@ async function main() {
 
   const harvest2023 = await prisma.harvest.create({ data: { year: 2023 } });
   const harvest2024 = await prisma.harvest.create({ data: { year: 2024 } });
+  await prisma.harvest.create({ data: { year: 2025 } });
 
   const producerCPF = await prisma.producer.create({
     data: {

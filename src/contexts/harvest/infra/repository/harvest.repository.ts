@@ -68,10 +68,19 @@ export class HarvestRepository implements IHarvestRepository {
   }
 
   async remove(id: string): Promise<void> {
-    this.logger.log(`Deleting harvest with ID: ${id}`);
-    await this.prisma.harvest.delete({ where: { id } });
-    this.logger.log('Harvest deleted successfully');
-  }
+   this.logger.log(`Attempting to delete harvest with ID: ${id}`);
+
+   const crops = await this.prisma.crop.findMany({ where: { harvestId: id } });
+
+   if (crops.length > 0) {
+     this.logger.warn(`Cannot delete harvest ${id} – it has associated crops`);
+     throw new Error(`Cannot delete harvest with ID ${id} because it has associated crops`);
+   }
+
+   await this.prisma.harvest.delete({ where: { id } });
+
+   this.logger.log('Harvest deleted successfully');
+ }
 
   private toEntity(data: any): HarvestEntity {
     return {
