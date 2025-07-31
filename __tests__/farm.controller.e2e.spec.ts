@@ -91,13 +91,20 @@ describe('FarmController (e2e)', () => {
     expect(res.body.name).toBe(updatedName);
   });
 
-  it('/farms/:id (DELETE) should delete a farm', async () => {// todo verificar com minha seed
+  it('/farms/:id (DELETE) should delete a farm', async () => {
     await request(app.getHttpServer())
-      .delete(`/farms/${createdFarmId}`)
+      .delete(`/farms/${farmIdToDelete}`)
       .expect(204);
 
     const res = await request(app.getHttpServer())
-      .get(`/farms/${createdFarmId}`)
+      .get(`/farms/${farmIdToDelete}`)
       .expect(404);
+  });
+
+  it('/farms/:id (DELETE) should fail to delete a farm', async () => {
+    const res = await request(app.getHttpServer())
+      .delete(`/farms/${createdFarmId}`)
+      .expect(500);
+
   });
 });
