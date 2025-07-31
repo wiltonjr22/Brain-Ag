@@ -2,9 +2,9 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '@/app.module';
-import { CreateProducerDto } from '../dtos/create.dto';
-import { DocType } from '../../commom/entities/producer.entities';
-import { UpdateProducerDto } from '../dtos/update.dto';
+import { CreateProducerDto } from '../src/contexts/producer/presentation/dtos/create.dto';
+import { DocType } from '../src/contexts/producer/commom/entities/producer.entities';
+import { UpdateProducerDto } from '../src/contexts/producer/presentation/dtos/update.dto';
 
 describe('ProducerController (e2e)', () => {
   let app: INestApplication;
