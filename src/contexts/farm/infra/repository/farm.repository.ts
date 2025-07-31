@@ -20,10 +20,12 @@ export class FarmRepository implements IFarmRepository {
 
   async findAll(filter: FarmFilterDto): Promise<{ data: FarmEntity[]; total: number }> {
     this.logger.log('Retrieving farms with filters...');
-    const { limit = 10, offset = 0, producerId } = filter;
+    const { limit = 10, offset = 0, producerId, city, state } = filter;
 
     const where: any = {};
-    if (producerId) where.producerId = producerId;
+    if (filter.producerId) where.producerId = producerId;
+    if (filter.city) where.city = city;
+    if (filter.state) where.state = state;
 
     const [farms, total] = await Promise.all([
       this.prisma.farm.findMany({
@@ -57,11 +59,18 @@ export class FarmRepository implements IFarmRepository {
   }
 
   async remove(id: string): Promise<void> {
-    this.logger.log(`Deleting producer with ID: ${id}`);
+    this.logger.log(`Attempting to delete farm with ID: ${id}`);
+
+    const crops = await this.prisma.crop.findMany({ where: { farmId: id } });
+    if (crops.length > 0) {
+      throw new Error(`Cannot delete farm with ID ${id} because it has associated crops`);
+    }
+
     await this.prisma.farm.delete({ where: { id } });
-    this.logger.log(`Producer with ID ${id} successfully updated.`);
-    return;
+
+    this.logger.log(`Farm with ID ${id} removed successfully`);
   }
+
 
   private toEntity(data: any): FarmEntity {
     return {

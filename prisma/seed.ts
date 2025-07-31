@@ -75,6 +75,18 @@ async function main() {
     },
   });
 
+  await prisma.farm.create({
+    data: {
+      name: 'Fazenda abaiara',
+      city: 'milagres',
+      state: 'Ce',
+      totalArea: 150,
+      arableArea: 100,
+      vegetationArea: 50,
+      producerId: producerCNPJ.id,
+    },
+  });
+
   const crops = [
     { name: 'Soja', farmId: farmMG.id },
     { name: 'Milho', farmId: farmSP.id },

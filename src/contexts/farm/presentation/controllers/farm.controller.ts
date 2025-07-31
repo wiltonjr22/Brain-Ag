@@ -41,8 +41,11 @@ export class FarmController {
   }
 
   @Get()
-  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Número máximo de itens por página' })
+  @ApiQuery({ name: 'producerId', required: false, description: 'Filtrar por id de produtor', example: 'f88cba4d-bbd7-49b1-8451-cdd3c94b84f6' })
+  @ApiQuery({ name: 'city', required: false, description: 'Filtrar por cidade', example: 'Fortaleza' })
+  @ApiQuery({ name: 'state', required: false, description: 'Filtrar por estado', example: 'CE' })
   @ApiQuery({ name: 'offset', required: false, example: 0, description: 'Número de itens a pular (offset)' })
+  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Número máximo de itens por página' })
   @ApiOperation({ summary: 'Listar fazendas com filtros opcionais' })
   @ApiResponse({
     status: 200,

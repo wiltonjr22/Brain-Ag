@@ -4,8 +4,6 @@ import { PrismaService } from '@/resources/database/prisma/prisma.service';
 import { CreateFarmDto } from '../../presentation/dtos/create.dto';
 import { UpdateFarmDto } from '../../presentation/dtos/update.dto';
 import { FarmFilterDto } from '../../presentation/dtos/get.dto';
-import { FarmEntity } from '../../commom/entities/communication.entities';
-import { NotFoundException } from '@nestjs/common';
 
 const mockPrismaService = {
   farm: {
@@ -16,7 +14,11 @@ const mockPrismaService = {
     update: jest.fn(),
     delete: jest.fn(),
   },
+  crop: {
+    findMany: jest.fn(),
+  },
 };
+
 
 describe('FarmRepository', () => {
   let repository: FarmRepository;
@@ -175,11 +177,26 @@ describe('FarmRepository', () => {
   });
 
   describe('remove', () => {
-    it('should delete the farm', async () => {
+    it('should delete the farm if it has no crops', async () => {
+      prisma.crop.findMany.mockResolvedValue([]);
       prisma.farm.delete.mockResolvedValue(undefined);
 
-      await expect(repository.remove('uuid-1')).resolves.toBeUndefined();
-      expect(prisma.farm.delete).toHaveBeenCalledWith({ where: { id: 'uuid-1' } });
-    });
+    await expect(repository.remove('uuid-1')).resolves.toBeUndefined();
+
+    expect(prisma.crop.findMany).toHaveBeenCalledWith({ where: { farmId: 'uuid-1' } });
+    expect(prisma.farm.delete).toHaveBeenCalledWith({ where: { id: 'uuid-1' } });
   });
+
+    it('should throw an error if farm has associated crops', async () => {
+      prisma.crop.findMany.mockResolvedValue([{ id: 'crop-1' }]);
+
+      await expect(repository.remove('uuid-1')).rejects.toThrow(
+        'Cannot delete farm with ID uuid-1 because it has associated crops'
+      );
+
+      expect(prisma.crop.findMany).toHaveBeenCalledWith({ where: { farmId: 'uuid-1' } });
+      expect(prisma.farm.delete).not.toHaveBeenCalled();
+  });
+  });
+
 });
