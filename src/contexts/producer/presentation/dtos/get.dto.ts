@@ -3,12 +3,12 @@ import {
   IsOptional,
   IsString,
   IsEnum,
-  IsBoolean,
-  IsInt,
   Min,
   IsDateString,
+  IsNumber,
 } from 'class-validator';
 import { DocType } from '../../commom/entities/producer.entities';
+import { Type } from 'class-transformer';
 
 export class ProducerFilterDto {
   @ApiPropertyOptional({ description: 'Filtrar por nome do produtor', example: 'João da Silva' })
@@ -19,7 +19,7 @@ export class ProducerFilterDto {
   @ApiPropertyOptional({ description: 'Filtrar por documento (CPF ou CNPJ)', example: '12345678900' })
   @IsOptional()
   @IsString()
-  document?: string;//todo fazer validação de CPF e CNPJ
+  document?: string;
 
   @ApiPropertyOptional({ description: 'Filtrar por tipo de documento', enum: DocType, example: DocType.CPF })
   @IsOptional()
@@ -38,13 +38,15 @@ export class ProducerFilterDto {
 
   @ApiPropertyOptional({ description: 'Número máximo de itens por página', example: 10, default: 10, minimum: 1 })
   @IsOptional()
-  @IsInt()
+  @IsNumber()
   @Min(1)
+  @Type(() => Number)
   limit?: number = 10;
 
   @ApiPropertyOptional({ description: 'Número de itens para pular (offset da paginação)', example: 0, default: 0, minimum: 0 })
   @IsOptional()
-  @IsInt()
+  @IsNumber()
   @Min(0)
+  @Type(() => Number)
   offset?: number = 0;
 }

@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, Min, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, Min, IsOptional, IsNumber } from 'class-validator';
 
 export class HarvestFilterDto {
   @ApiPropertyOptional({
@@ -11,19 +12,15 @@ export class HarvestFilterDto {
   @Min(1900)
   year?: number;
 
-  @ApiPropertyOptional({
-    description: 'Número máximo de itens por página',
-    example: 10,
-  })
+  @ApiPropertyOptional({ description: 'Limite de itens por página', example: 10 })
   @IsOptional()
-  @IsInt()
+  @IsNumber()
+  @Type(() => Number)
   limit?: number = 10;
 
-  @ApiPropertyOptional({
-    description: 'Número de itens para pular (offset da paginação)',
-    example: 0,
-  })
+  @ApiPropertyOptional({ description: 'Offset para paginação', example: 0 })
   @IsOptional()
-  @IsInt()
+  @IsNumber()
+  @Type(() => Number)
   offset?: number = 0;
 }

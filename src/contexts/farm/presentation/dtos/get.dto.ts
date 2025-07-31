@@ -1,5 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsUUID, IsString, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer'; // ⬅️ importante!
 
 export class FarmFilterDto {
   @ApiPropertyOptional({ description: 'ID do produtor', example: 'f88cba4d-bbd7-49b1-8451-cdd3c94b84f6' })
@@ -20,10 +21,12 @@ export class FarmFilterDto {
   @ApiPropertyOptional({ description: 'Limite de itens por página', example: 10 })
   @IsOptional()
   @IsNumber()
-  limit?: number;
+  @Type(() => Number)
+  limit?: number = 10;
 
   @ApiPropertyOptional({ description: 'Offset para paginação', example: 0 })
   @IsOptional()
   @IsNumber()
-  offset?: number;
+  @Type(() => Number)
+  offset?: number = 0;
 }
