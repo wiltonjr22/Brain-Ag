@@ -94,6 +94,12 @@ docker-compose up --build
   docker-compose run --rm seed
   ```
 
+  - To run tests manually:
+
+  ```bash
+  docker-compose run --rm test
+  ```
+
 ---
 
 ### 4. Access Swagger Documentation
@@ -131,7 +137,7 @@ You can interact with all API endpoints here.
 Run unit tests with:
 
 ```bash
-npm run t
+npm run test
 ```
 
 - Tests cover controllers and services, using mocks for external dependencies for unit and for e2e we use seeds and data
