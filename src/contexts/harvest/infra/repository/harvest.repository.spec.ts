@@ -4,7 +4,6 @@ import { PrismaService } from '@/resources/database/prisma/prisma.service';
 import { CreateHarvestDto } from '../../presentation/dtos/create.dto';
 import { UpdateHarvestDto } from '../../presentation/dtos/update.dto';
 import { HarvestFilterDto } from '../../presentation/dtos/get.dto';
-import { HarvestEntity } from '../../commom/entities/harvest.entities';
 
 describe('HarvestRepository', () => {
   let repository: HarvestRepository;
@@ -19,6 +18,9 @@ describe('HarvestRepository', () => {
         findUnique: jest.fn(),
         update: jest.fn(),
         delete: jest.fn(),
+      },
+      crop: {
+        findMany: jest.fn(),
       },
     };
 
@@ -132,14 +134,28 @@ describe('HarvestRepository', () => {
   });
 
   describe('remove', () => {
-    it('should call prisma.harvest.delete with correct id', async () => {
+    it('should call prisma.harvest.delete with correct id when no crops exist', async () => {
       const id = 'uuid-harvest';
 
+      prisma.crop.findMany.mockResolvedValue([]); // ✅ sem culturas associadas
       prisma.harvest.delete.mockResolvedValue(undefined);
 
       await repository.remove(id);
 
+      expect(prisma.crop.findMany).toHaveBeenCalledWith({ where: { harvestId: id } });
       expect(prisma.harvest.delete).toHaveBeenCalledWith({ where: { id } });
+    });
+
+    it('should throw error when crops are associated with the harvest', async () => {
+      const id = 'uuid-harvest';
+
+      prisma.crop.findMany.mockResolvedValue([{ id: 'crop-1' }]); // ✅ com cultura associada
+
+      await expect(repository.remove(id)).rejects.toThrowError(
+        `Cannot delete harvest with ID ${id} because it has associated crops`,
+      );
+
+      expect(prisma.harvest.delete).not.toHaveBeenCalled();
     });
   });
 });
