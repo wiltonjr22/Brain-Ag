@@ -1,43 +1,77 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '@/app.module';
 import { PrismaService } from '@/resources/database/prisma/prisma.service';
 
 describe('CropController (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let createdCropId: string;
+  let producerId: string;
   let farmId: string;
   let harvestId: string;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
+    const moduleRef: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
     app = moduleRef.createNestApplication();
     await app.init();
 
-    prisma = moduleRef.get(PrismaService);
+    prisma = moduleRef.get<PrismaService>(PrismaService);
+  });
 
-    const farm = await prisma.farm.findFirst();
-    farmId = farm?.id;
+  beforeEach(async () => {
+    // Limpa tabelas na ordem correta para evitar FK violations
+    await prisma.crop.deleteMany();
+    await prisma.farm.deleteMany();
+    await prisma.harvest.deleteMany();
+    await prisma.producer.deleteMany();
 
-    const harvest = await prisma.harvest.findFirst();
-    harvestId = harvest?.id;
+    // Cria produtor único
+    const uniqueDoc = `doc-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    const producer = await prisma.producer.create({
+      data: {
+        name: 'Produtor E2E',
+        document: uniqueDoc,
+        docType: 'CPF',
+      },
+    });
+    producerId = producer.id;
 
+    // Cria fazenda vinculada ao produtor
+    const farm = await prisma.farm.create({
+      data: {
+        name: 'Fazenda E2E',
+        city: 'Cidade Teste',
+        state: 'ST',
+        totalArea: 100,
+        arableArea: 60,
+        vegetationArea: 40,
+        producerId,
+      },
+    });
+    farmId = farm.id;
 
-    prisma = moduleRef.get(PrismaService);
-    const cropId = await prisma.crop.findFirst();
-    createdCropId = cropId!.id;
+    // Cria safra
+    const harvest = await prisma.harvest.create({
+      data: {
+        year: new Date().getFullYear(),
+      },
+    });
+    harvestId = harvest.id;
   });
 
   afterAll(async () => {
+    await prisma.crop.deleteMany();
+    await prisma.farm.deleteMany();
+    await prisma.harvest.deleteMany();
+    await prisma.producer.deleteMany();
     await app.close();
   });
 
-  it('/crops (POST) should create a crop', async () => {
+  it('/POST culturas', async () => {
     const dto = {
       name: 'Milho E2E',
       farmId,
@@ -45,16 +79,25 @@ describe('CropController (e2e)', () => {
     };
 
     const res = await request(app.getHttpServer())
-      .post('/crops')
+      .post('/culturas')
       .send(dto)
       .expect(201);
 
     expect(res.body).toEqual({});
   });
 
-  it('/crops (GET) should list all crops', async () => {
+  it('/GET culturas should return a list of crops', async () => {
+    // Criar uma cultura para garantir que exista
+    await prisma.crop.create({
+      data: {
+        name: 'Milho E2E',
+        farmId,
+        harvestId,
+      },
+    });
+
     const res = await request(app.getHttpServer())
-      .get('/crops')
+      .get('/culturas')
       .expect(200);
 
     expect(res.body).toHaveProperty('data');
@@ -63,32 +106,55 @@ describe('CropController (e2e)', () => {
     expect(res.body.data.length).toBeGreaterThan(0);
   });
 
-  it('/crops/:id (GET) should return a crop by ID', async () => {
+  it('/GET culturas/:id', async () => {
+    // Criar cultura para teste
+    const crop = await prisma.crop.create({
+      data: {
+        name: 'Milho E2E',
+        farmId,
+        harvestId,
+      },
+    });
+
     const res = await request(app.getHttpServer())
-      .get(`/crops/${createdCropId}`)
+      .get(`/culturas/${crop.id}`)
       .expect(200);
 
-    expect(res.body).toHaveProperty('id', createdCropId);
+    expect(res.body).toHaveProperty('id', crop.id);
   });
 
-  it('/crops/:id (PATCH) should update a crop', async () => {
+  it('/PATCH culturas/:id', async () => {
+    // Criar cultura para teste
+    const crop = await prisma.crop.create({
+      data: {
+        name: 'Milho E2E',
+        farmId,
+        harvestId,
+      },
+    });
+
     const newName = 'Milho E2E Atualizado';
 
     const res = await request(app.getHttpServer())
-      .patch(`/crops/${createdCropId}`)
+      .patch(`/culturas/${crop.id}`)
       .send({ name: newName })
       .expect(200);
 
     expect(res.body.name).toBe(newName);
   });
 
-  it('/crops/:id (DELETE) should delete a crop', async () => {
-    await request(app.getHttpServer())
-      .delete(`/crops/${createdCropId}`)
-      .expect(204);
+  it('/DELETE culturas/:id', async () => {
+    // Criar cultura para teste
+    const crop = await prisma.crop.create({
+      data: {
+        name: 'Milho E2E',
+        farmId,
+        harvestId,
+      },
+    });
 
     await request(app.getHttpServer())
-      .get(`/crops/${createdCropId}`)
-      .expect(404);
+      .delete(`/culturas/${crop.id}`)
+      .expect(204);
   });
 });

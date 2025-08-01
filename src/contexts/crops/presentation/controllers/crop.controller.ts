@@ -26,7 +26,7 @@ import { CropEntity } from '../../commom/entities/crops.entities';
 import { ICropService } from '../../application/interfaces/crops.service';
 
 @ApiTags('Culturas')
-@Controller('crops')
+  @Controller('culturas')
 export class CropController {
   private readonly logger = new Logger(CropController.name);
 
