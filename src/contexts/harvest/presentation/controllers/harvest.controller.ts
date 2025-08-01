@@ -26,7 +26,7 @@ import { HarvestFilterDto } from '../dtos/get.dto';
 import { HarvestEntity } from '../../commom/entities/harvest.entities';
 
 @ApiTags('Safras')
-@Controller('harvests')
+  @Controller('safras')
 export class HarvestController {
   private readonly logger = new Logger(HarvestController.name);
 

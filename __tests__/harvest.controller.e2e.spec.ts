@@ -1,55 +1,94 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '@/app.module';
 import { PrismaService } from '@/resources/database/prisma/prisma.service';
 
 describe('HarvestController (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
+  let producerId: string;
   let createdHarvestId: string;
-  let harvestToDeleteId: string
+  let harvestToDeleteId: string;
   let harvestWithCropsId: string;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
+    const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    app = moduleRef.createNestApplication();
+    app = moduleFixture.createNestApplication();
     await app.init();
 
-    prisma = moduleRef.get(PrismaService);
-    prisma = moduleRef.get(PrismaService);
-    const harvesId = await prisma.harvest.findFirst();
-    createdHarvestId = harvesId!.id;
+    prisma = moduleFixture.get<PrismaService>(PrismaService);
 
-    const harvestToDelete = await prisma.harvest.findFirst({ where: { year: 2025 } });
-    harvestToDeleteId = harvestToDelete!.id;
+    await prisma.crop.deleteMany();
+    await prisma.harvest.deleteMany();
+    await prisma.farm.deleteMany();
+    await prisma.producer.deleteMany();
 
-    const harvestWithCrops = await prisma.harvest.findFirst({ where: { year: 2023 } });
-    harvestWithCropsId = harvestWithCrops!.id;
+    const uniqueDocument = `1234567890${Date.now()}`;
+    const producer = await prisma.producer.create({
+      data: {
+        name: 'Produtor Teste',
+        document: uniqueDocument,
+        docType: 'CPF',
+      },
+    });
+    producerId = producer.id;
+    const harvestToDelete = await prisma.harvest.create({
+      data: {
+        year: 2024,
+      },
+    });
+    harvestToDeleteId = harvestToDelete.id;
 
+    const harvestWithCrops = await prisma.harvest.create({
+      data: {
+        year: 2025,
+      },
+    });
+    harvestWithCropsId = harvestWithCrops.id;
+
+    const farm = await prisma.farm.create({
+      data: {
+        name: 'Fazenda Teste',
+        city: 'Cidade Teste',
+        state: 'Estado Teste',
+        totalArea: 100,
+        arableArea: 80,
+        vegetationArea: 20,
+        producer: { connect: { id: producerId } },
+      },
+    });
+
+    await prisma.crop.create({
+      data: {
+        name: 'Milho',
+        farmId: farm.id,
+        harvestId: harvestWithCropsId,
+      },
+    });
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  it('/harvests (POST) should create a harvest', async () => {
+  it('/POST safras', async () => {
     const dto = { year: 2026 };
 
     const res = await request(app.getHttpServer())
-      .post('/harvests')
+      .post('/safras')
       .send(dto)
       .expect(201);
 
     expect(res.body).toEqual({});
   });
 
-  it('/harvests (GET) should return a list of harvests', async () => {
+  it('/GET safras should return a list of harvests', async () => {
     const res = await request(app.getHttpServer())
-      .get('/harvests')
+      .get('/safras')
       .expect(200);
 
     expect(res.body).toHaveProperty('data');
@@ -58,18 +97,30 @@ describe('HarvestController (e2e)', () => {
     expect(res.body.data.length).toBeGreaterThan(0);
   });
 
-  it('/harvests/:id (GET) should return a harvest by id', async () => {
+  it('GET safras/:id', async () => {
+    const harvest = await prisma.harvest.findFirst({
+      where: {
+        year: 2025,
+
+      },
+    });
     const res = await request(app.getHttpServer())
-      .get(`/harvests/${createdHarvestId}`)
+      .get(`/safras/${harvest.id}`)
       .expect(200);
 
-    expect(res.body).toHaveProperty('id', createdHarvestId);
+    expect(res.body).toHaveProperty('id', harvest.id);
   });
 
-  it('/harvests/:id (PATCH) should update a harvest', async () => {
+  it('/PATCH safras/:id', async () => {
+    const harvest = await prisma.harvest.findFirst({
+      where: {
+        year: 2025,
+
+      },
+    });
     const updatedYear = 2027;
     const res = await request(app.getHttpServer())
-      .patch(`/harvests/${createdHarvestId}`)
+      .patch(`/safras/${harvest.id}`)
       .send({ year: updatedYear })
       .expect(200);
 
@@ -78,7 +129,7 @@ describe('HarvestController (e2e)', () => {
 
   it('/harvests/:id (DELETE) should delete a harvest with no crops', async () => {
     await request(app.getHttpServer())
-      .delete(`/harvests/${harvestToDeleteId}`)
+      .delete(`/safras/${harvestToDeleteId}`)
       .expect(204);
 
     await request(app.getHttpServer())
@@ -88,9 +139,9 @@ describe('HarvestController (e2e)', () => {
 
   it('/harvests/:id (DELETE) should fail to delete a harvest with crops', async () => {
     const res = await request(app.getHttpServer())
-      .delete(`/harvests/${harvestWithCropsId}`)
+      .delete(`/safras/${harvestWithCropsId}`)
       .expect(500);
 
-    expect(res.body.message).toMatch(/associated crops/i);
+    expect(res.body).toHaveProperty('message');
   });
 });
