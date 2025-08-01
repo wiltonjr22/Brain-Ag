@@ -127,7 +127,7 @@ describe('HarvestController (e2e)', () => {
     expect(res.body.year).toBe(updatedYear);
   });
 
-  it('/harvests/:id (DELETE) should delete a harvest with no crops', async () => {
+  it('/DELETE safras/:id should delete a harvest with no crops', async () => {
     await request(app.getHttpServer())
       .delete(`/safras/${harvestToDeleteId}`)
       .expect(204);
@@ -137,7 +137,7 @@ describe('HarvestController (e2e)', () => {
       .expect(404);
   });
 
-  it('/harvests/:id (DELETE) should fail to delete a harvest with crops', async () => {
+  it('/DELETE safras/:id should fail to delete a harvest with crops', async () => {
     const res = await request(app.getHttpServer())
       .delete(`/safras/${harvestWithCropsId}`)
       .expect(500);
