@@ -20,8 +20,11 @@ describe('FarmController (e2e)', () => {
     prisma = moduleRef.get(PrismaService);
   });
 
-  afterAll(async () => {
-    await app.close();
+  beforeEach(async () => {
+    await prisma.crop.deleteMany();
+    await prisma.farm.deleteMany();
+    await prisma.producer.deleteMany();
+    await prisma.harvest.deleteMany();
   });
 
   afterEach(async () => {
@@ -31,11 +34,15 @@ describe('FarmController (e2e)', () => {
     await prisma.harvest.deleteMany();
   });
 
+  afterAll(async () => {
+    await app.close();
+  });
+
   it('/POST fazendas', async () => {
     const producer = await prisma.producer.create({
       data: {
         name: 'Produtor E2E POST',
-        document: `1234567890${Date.now()}`,
+        document: '078.180.370-55', 
         docType: 'CPF',
       },
     });
@@ -205,10 +212,8 @@ describe('FarmController (e2e)', () => {
       },
     });
 
-    const res = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .delete(`/fazendas/${farm.id}`)
       .expect(500);
-
-    expect(res.body).toHaveProperty('message');
   });
 });

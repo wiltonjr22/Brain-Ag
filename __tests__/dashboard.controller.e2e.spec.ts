@@ -20,20 +20,57 @@ describe('DashboardController (e2e)', () => {
     await app.init();
 
     prisma = moduleRef.get(PrismaService);
+  });
 
-    const crop = await prisma.crop.findFirst({
-      include: {
-        farm: { include: { producer: true } },
+  beforeEach(async () => {
+    await prisma.crop.deleteMany();
+    await prisma.farm.deleteMany();
+    await prisma.producer.deleteMany();
+    await prisma.harvest.deleteMany();
+
+    const producer = await prisma.producer.create({
+      data: {
+        name: 'Produtor Dashboard',
+        document: '18590260011',
+        docType: 'CPF',
+      },
+    });
+    producerId = producer.id;
+
+    const farm = await prisma.farm.create({
+      data: {
+        name: 'Fazenda Dashboard',
+        city: 'Cidade Dash',
+        state: 'SP',
+        totalArea: 150,
+        arableArea: 100,
+        vegetationArea: 50,
+        producerId,
+      },
+    });
+    state = farm.state;
+
+    const harvest = await prisma.harvest.create({
+      data: {
+        year: new Date().getFullYear(),
       },
     });
 
-    if (!crop) {
-      throw new Error('Seed data missing: expected at least one crop.');
-    }
-
+    const crop = await prisma.crop.create({
+      data: {
+        name: 'Milho Dashboard',
+        farmId: farm.id,
+        harvestId: harvest.id,
+      },
+    });
     cropName = crop.name;
-    state = crop.farm.state;
-    producerId = crop.farm.producer.id;
+  });
+
+  afterEach(async () => {
+    await prisma.crop.deleteMany();
+    await prisma.farm.deleteMany();
+    await prisma.producer.deleteMany();
+    await prisma.harvest.deleteMany();
   });
 
   afterAll(async () => {

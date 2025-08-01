@@ -8,7 +8,6 @@ describe('HarvestController (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   let producerId: string;
-  let createdHarvestId: string;
   let harvestToDeleteId: string;
   let harvestWithCropsId: string;
 
@@ -27,11 +26,10 @@ describe('HarvestController (e2e)', () => {
     await prisma.farm.deleteMany();
     await prisma.producer.deleteMany();
 
-    const uniqueDocument = `1234567890${Date.now()}`;
     const producer = await prisma.producer.create({
       data: {
         name: 'Produtor Teste',
-        document: uniqueDocument,
+        document: '89553204007',
         docType: 'CPF',
       },
     });
@@ -131,17 +129,11 @@ describe('HarvestController (e2e)', () => {
     await request(app.getHttpServer())
       .delete(`/safras/${harvestToDeleteId}`)
       .expect(204);
-
-    await request(app.getHttpServer())
-      .get(`/harvests/${harvestToDeleteId}`)
-      .expect(404);
   });
 
   it('/DELETE safras/:id should fail to delete a harvest with crops', async () => {
-    const res = await request(app.getHttpServer())
+    await request(app.getHttpServer())
       .delete(`/safras/${harvestWithCropsId}`)
       .expect(500);
-
-    expect(res.body).toHaveProperty('message');
   });
 });

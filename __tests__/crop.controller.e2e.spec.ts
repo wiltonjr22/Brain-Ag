@@ -23,24 +23,20 @@ describe('CropController (e2e)', () => {
   });
 
   beforeEach(async () => {
-    // Limpa tabelas na ordem correta para evitar FK violations
     await prisma.crop.deleteMany();
     await prisma.farm.deleteMany();
-    await prisma.harvest.deleteMany();
     await prisma.producer.deleteMany();
+    await prisma.harvest.deleteMany();
 
-    // Cria produtor único
-    const uniqueDoc = `doc-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
     const producer = await prisma.producer.create({
       data: {
         name: 'Produtor E2E',
-        document: uniqueDoc,
+        document: '147.498.890-32', 
         docType: 'CPF',
       },
     });
     producerId = producer.id;
 
-    // Cria fazenda vinculada ao produtor
     const farm = await prisma.farm.create({
       data: {
         name: 'Fazenda E2E',
@@ -54,7 +50,6 @@ describe('CropController (e2e)', () => {
     });
     farmId = farm.id;
 
-    // Cria safra
     const harvest = await prisma.harvest.create({
       data: {
         year: new Date().getFullYear(),
@@ -63,11 +58,14 @@ describe('CropController (e2e)', () => {
     harvestId = harvest.id;
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await prisma.crop.deleteMany();
     await prisma.farm.deleteMany();
-    await prisma.harvest.deleteMany();
     await prisma.producer.deleteMany();
+    await prisma.harvest.deleteMany();
+  });
+
+  afterAll(async () => {
     await app.close();
   });
 
@@ -87,7 +85,6 @@ describe('CropController (e2e)', () => {
   });
 
   it('/GET culturas should return a list of crops', async () => {
-    // Criar uma cultura para garantir que exista
     await prisma.crop.create({
       data: {
         name: 'Milho E2E',
@@ -107,7 +104,6 @@ describe('CropController (e2e)', () => {
   });
 
   it('/GET culturas/:id', async () => {
-    // Criar cultura para teste
     const crop = await prisma.crop.create({
       data: {
         name: 'Milho E2E',
@@ -124,7 +120,6 @@ describe('CropController (e2e)', () => {
   });
 
   it('/PATCH culturas/:id', async () => {
-    // Criar cultura para teste
     const crop = await prisma.crop.create({
       data: {
         name: 'Milho E2E',
@@ -144,7 +139,6 @@ describe('CropController (e2e)', () => {
   });
 
   it('/DELETE culturas/:id', async () => {
-    // Criar cultura para teste
     const crop = await prisma.crop.create({
       data: {
         name: 'Milho E2E',

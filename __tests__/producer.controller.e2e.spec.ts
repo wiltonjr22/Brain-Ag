@@ -10,7 +10,7 @@ import { PrismaService } from '@/resources/database/prisma/prisma.service';
 describe('ProducerController (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let mockCreateDto: CreateProducerDto;
+  let baseCreateDto: CreateProducerDto
   let updateDto: UpdateProducerDto;
 
   beforeAll(async () => {
@@ -24,10 +24,10 @@ describe('ProducerController (e2e)', () => {
 
     prisma = moduleRef.get(PrismaService);
 
-    mockCreateDto = {
+    baseCreateDto = {
       docType: DocType.CPF,
-      document: '11144477735',
       name: 'João da Silva',
+      document: '11144477735'
     };
 
     updateDto = {
@@ -35,21 +35,33 @@ describe('ProducerController (e2e)', () => {
     };
   });
 
+  beforeEach(async () => {
+    await prisma.crop.deleteMany();
+    await prisma.harvest.deleteMany();
+    await prisma.farm.deleteMany();
+    await prisma.producer.deleteMany();
+  });
+
   afterAll(async () => {
+    await prisma.crop.deleteMany();
+    await prisma.harvest.deleteMany();
+    await prisma.farm.deleteMany();
+    await prisma.producer.deleteMany();
     await app.close();
   });
 
   it('/POST produtores', async () => {
     const response = await request(app.getHttpServer())
       .post('/produtores')
-      .send(mockCreateDto)
+      .send(baseCreateDto)
       .expect(201);
-
 
     expect(response.body).toEqual({});
   });
 
   it('/GET produtores should return a list of producers', async () => {
+    await prisma.producer.create({ data: baseCreateDto });
+
     const res = await request(app.getHttpServer())
       .get('/produtores')
       .expect(200);
@@ -61,13 +73,8 @@ describe('ProducerController (e2e)', () => {
   });
 
   it('/GET produtores/:id', async () => {
+    const producer = await prisma.producer.create({ data: baseCreateDto });
 
-    const producer = await prisma.producer.findFirst({
-      where: {
-        document: mockCreateDto.document,
-        docType: mockCreateDto.docType,
-      },
-    });
     const response = await request(app.getHttpServer())
       .get(`/produtores/${producer.id}`)
       .expect(200);
@@ -76,12 +83,8 @@ describe('ProducerController (e2e)', () => {
   });
 
   it('/PATCH produtores/:id', async () => {
-    const producer = await prisma.producer.findFirst({
-      where: {
-        document: mockCreateDto.document,
-        docType: mockCreateDto.docType,
-      },
-    });
+    const producer = await prisma.producer.create({ data: baseCreateDto });
+
     const response = await request(app.getHttpServer())
       .patch(`/produtores/${producer.id}`)
       .send(updateDto)
@@ -91,12 +94,8 @@ describe('ProducerController (e2e)', () => {
   });
 
   it('/DELETE produtores/:id', async () => {
-    const producer = await prisma.producer.findFirst({
-      where: {
-        document: mockCreateDto.document,
-        docType: mockCreateDto.docType,
-      },
-    });
+    const producer = await prisma.producer.create({ data: baseCreateDto });
+
     await request(app.getHttpServer())
       .delete(`/produtores/${producer.id}`)
       .expect(204);
