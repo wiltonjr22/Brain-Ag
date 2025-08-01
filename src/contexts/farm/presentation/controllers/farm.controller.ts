@@ -26,7 +26,7 @@ import { FarmFilterDto } from '../dtos/get.dto';
 import { FarmEntity } from '../../commom/entities/communication.entities';
 
 @ApiTags('Fazendas')
-@Controller('farms')
+  @Controller('fazendas')
 export class FarmController {
   private readonly logger = new Logger(FarmController.name);
 

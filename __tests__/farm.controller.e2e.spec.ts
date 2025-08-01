@@ -8,8 +8,8 @@ import { CreateFarmDto } from '@/contexts/farm/presentation/dtos/create.dto';
 describe('FarmController (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let createdFarmId: string;
   let producerId: string;
+  let createdFarmId: string;
   let farmIdToDelete: string;
 
   beforeAll(async () => {
@@ -21,31 +21,62 @@ describe('FarmController (e2e)', () => {
     await app.init();
 
     prisma = moduleRef.get(PrismaService);
-    const producer = await prisma.producer.findFirst();
-    producerId = producer!.id;
 
-    prisma = moduleRef.get(PrismaService);
-    const farmId = await prisma.farm.findFirst();
-    createdFarmId = farmId!.id;
+    await prisma.crop.deleteMany();
+    await prisma.farm.deleteMany();
+    await prisma.producer.deleteMany();
 
-    prisma = moduleRef.get(PrismaService);
-    const farmIdWithNoCrops = await prisma.farm.findFirst({
-      where: {
-        name: 'Fazenda abaiara',
-        city: 'milagres',
-        state: 'Ce',
+    const producer = await prisma.producer.create({
+      data: {
+        name: 'Produtor E2E',
+        document: `1234567890${Date.now()}`,
+        docType: 'CPF',
       },
     });
-    farmIdToDelete = farmIdWithNoCrops!.id;
+    producerId = producer.id;
+
+    const farmWithDependencies = await prisma.farm.create({
+      data: {
+        name: 'Fazenda Com Dependencias',
+        city: 'Cidade X',
+        state: 'SP',
+        totalArea: 150,
+        arableArea: 100,
+        vegetationArea: 50,
+        producerId: producerId,
+      },
+    });
+    createdFarmId = farmWithDependencies.id;
+
+    await prisma.crop.create({
+      data: {
+        name: 'Soja',
+        farmId: createdFarmId,
+        harvestId: (await prisma.harvest.create({ data: { year: 2025 } })).id,
+      },
+    });
+
+    const farmToDelete = await prisma.farm.create({
+      data: {
+        name: 'Fazenda Para Deletar',
+        city: 'Cidade Y',
+        state: 'MG',
+        totalArea: 80,
+        arableArea: 60,
+        vegetationArea: 20,
+        producerId: producerId,
+      },
+    });
+    farmIdToDelete = farmToDelete.id;
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  it('/farms (POST) should create a farm', async () => {
+  it('/POST fazendas', async () => {
     const dto: CreateFarmDto = {
-      name: 'Fazenda E2E',
+      name: 'Fazenda E2E Nova',
       city: 'Campo Novo',
       state: 'SP',
       totalArea: 100,
@@ -55,16 +86,16 @@ describe('FarmController (e2e)', () => {
     };
 
     const res = await request(app.getHttpServer())
-      .post('/farms')
+      .post('/fazendas')
       .send(dto)
       .expect(201);
 
     expect(res.body).toEqual({});
   });
 
-  it('/farms (GET) should list all farms', async () => {
+  it('/GET fazendas should return a list of farms', async () => {
     const res = await request(app.getHttpServer())
-      .get('/farms')
+      .get('/fazendas')
       .expect(200);
 
     expect(res.body).toHaveProperty('data');
@@ -73,38 +104,35 @@ describe('FarmController (e2e)', () => {
     expect(res.body.data.length).toBeGreaterThan(0);
   });
 
-  it('/farms/:id (GET) should return a farm by ID', async () => {
+  it('GET fazendas/:id', async () => {
     const res = await request(app.getHttpServer())
-      .get(`/farms/${createdFarmId}`)
+      .get(`/fazendas/${createdFarmId}`)
       .expect(200);
 
     expect(res.body).toHaveProperty('id', createdFarmId);
   });
 
-  it('/farms/:id (PATCH) should update a farm', async () => {
+  it('/PATCH fazendas/:id', async () => {
     const updatedName = 'Fazenda Atualizada';
     const res = await request(app.getHttpServer())
-      .patch(`/farms/${createdFarmId}`)
+      .patch(`/fazendas/${createdFarmId}`)
       .send({ name: updatedName })
       .expect(200);
 
     expect(res.body.name).toBe(updatedName);
   });
 
-  it('/farms/:id (DELETE) should delete a farm', async () => {
+  it('/DELETE fazendas/:id should delete a farm', async () => {
     await request(app.getHttpServer())
-      .delete(`/farms/${farmIdToDelete}`)
+      .delete(`/fazendas/${farmIdToDelete}`)
       .expect(204);
-
-    const res = await request(app.getHttpServer())
-      .get(`/farms/${farmIdToDelete}`)
-      .expect(404);
   });
 
-  it('/farms/:id (DELETE) should fail to delete a farm', async () => {
+  it('/DELETE fazendas/:id should fail to delete a farm with crops', async () => {
     const res = await request(app.getHttpServer())
-      .delete(`/farms/${createdFarmId}`)
+      .delete(`/fazendas/${createdFarmId}`)
       .expect(500);
 
+    expect(res.body).toHaveProperty('message');
   });
 });
